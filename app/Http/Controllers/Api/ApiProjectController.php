@@ -13,13 +13,30 @@ class ApiProjectController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api'); // Requires API authentication (e.g., Sanctum token)
+        // No authentication middleware to allow public access
     }
 
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $projects = Project::with('category', 'user')->get();
+            $query = Project::with(['category', 'user']);
+
+            // Filter by category if provided
+            if ($request->has('category')) {
+                $categoryQuery = $request->input('category');
+
+                // Check if category is a numeric ID or a name
+                if (is_numeric($categoryQuery)) {
+                    $query->where('category_id', $categoryQuery);
+                } else {
+                    $query->whereHas('category', function ($q) use ($categoryQuery) {
+                        $q->where('name', 'like', '%' . $categoryQuery . '%');
+                    });
+                }
+            }
+
+            $projects = $query->get();
+
             return response()->json([
                 'status' => 'success',
                 'data' => $projects,
@@ -38,7 +55,7 @@ class ApiProjectController extends Controller
     public function show($id)
     {
         try {
-            $project = Project::with('category', 'user')->findOrFail($id);
+            $project = Project::with(['category', 'user'])->findOrFail($id);
             return response()->json([
                 'status' => 'success',
                 'data' => $project,
@@ -89,7 +106,7 @@ class ApiProjectController extends Controller
                 $validated['thumbnail'] = $request->file('thumbnail')->store('thumbnails', 'public');
             }
 
-            $validated['uploaded_by'] = auth()->guard('api')->user()->id ?? null;
+            $validated['uploaded_by'] = null; // Set to null since authentication is removed
             $validated['status'] = 'Draft';
 
             $project = Project::create($validated);

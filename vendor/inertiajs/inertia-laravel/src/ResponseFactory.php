@@ -31,6 +31,13 @@ class ResponseFactory
 
     protected $encryptHistory;
 
+    /** @var Closure|null */
+    protected $urlResolver;
+
+    /***
+     * @param string $name The name of the root view
+     * @return void
+     */
     public function setRootView(string $name): void
     {
         $this->rootView = $name;
@@ -64,7 +71,10 @@ class ResponseFactory
         return $this->sharedProps;
     }
 
-    public function flushShared(): void
+    /**
+     * @return void
+     */
+    public function flushShared()
     {
         $this->sharedProps = [];
     }
@@ -86,11 +96,19 @@ class ResponseFactory
         return (string) $version;
     }
 
+    public function resolveUrlUsing(?Closure $urlResolver = null): void
+    {
+        $this->urlResolver = $urlResolver;
+    }
+
     public function clearHistory(): void
     {
         session(['inertia.clear_history' => true]);
     }
 
+    /**
+     * @param  bool  $encrypt
+     */
     public function encryptHistory($encrypt = true): void
     {
         $this->encryptHistory = $encrypt;
@@ -125,6 +143,14 @@ class ResponseFactory
     /**
      * @param  mixed  $value
      */
+    public function deepMerge($value): MergeProp
+    {
+        return (new MergeProp($value))->deepMerge();
+    }
+
+    /**
+     * @param  mixed  $value
+     */
     public function always($value): AlwaysProp
     {
         return new AlwaysProp($value);
@@ -145,6 +171,7 @@ class ResponseFactory
             $this->rootView,
             $this->getVersion(),
             $this->encryptHistory ?? config('inertia.history.encrypt', false),
+            $this->urlResolver,
         );
     }
 

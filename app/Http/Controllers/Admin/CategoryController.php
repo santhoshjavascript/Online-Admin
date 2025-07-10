@@ -11,11 +11,11 @@ class CategoryController extends Controller
     /**
      * Create a new controller instance.
      *
-     * Apply middleware to ensure only authenticated admins can access these methods.
+     * No middleware applied to allow public access.
      */
     public function __construct()
     {
-        // $this->middleware(['auth', 'isAdmin']);
+        // Middleware removed for public access
     }
 
     /**

@@ -1,12 +1,12 @@
 <?php
 
 return [
-    'paths' => ['api/*'],
-    'allowed_methods' => ['*'],
-    'allowed_origins' => ['http://localhost:3000'],
+    'paths' => ['api/*'], // Apply CORS to all API routes
+    'allowed_methods' => ['*'], // Allow all HTTP methods
+    'allowed_origins' => ['http://localhost:5173'], // Allow frontend origin
     'allowed_origins_patterns' => [],
-    'allowed_headers' => ['*'],
+    'allowed_headers' => ['*'], // Allow all headers
     'exposed_headers' => [],
     'max_age' => 0,
-    'supports_credentials' => true,
+    'supports_credentials' => false, // Set to true if you need cookies/auth headers
 ];

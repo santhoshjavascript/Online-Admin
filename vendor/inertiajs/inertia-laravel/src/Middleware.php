@@ -29,15 +29,15 @@ class Middleware
     public function version(Request $request)
     {
         if (config('app.asset_url')) {
-            return md5(config('app.asset_url'));
-        }
-
-        if (file_exists($manifest = public_path('mix-manifest.json'))) {
-            return md5_file($manifest);
+            return hash('xxh128', config('app.asset_url'));
         }
 
         if (file_exists($manifest = public_path('build/manifest.json'))) {
-            return md5_file($manifest);
+            return hash_file('xxh128', $manifest);
+        }
+
+        if (file_exists($manifest = public_path('mix-manifest.json'))) {
+            return hash_file('xxh128', $manifest);
         }
 
         return null;
@@ -70,6 +70,16 @@ class Middleware
     }
 
     /**
+     * Defines a callback that returns the relative URL.
+     *
+     * @return Closure|null
+     */
+    public function urlResolver()
+    {
+        return null;
+    }
+
+    /**
      * Handle the incoming request.
      *
      * @return Response
@@ -82,6 +92,10 @@ class Middleware
 
         Inertia::share($this->share($request));
         Inertia::setRootView($this->rootView($request));
+
+        if ($urlResolver = $this->urlResolver()) {
+            Inertia::resolveUrlUsing($urlResolver);
+        }
 
         $response = $next($request);
         $response->headers->set('Vary', Header::INERTIA);

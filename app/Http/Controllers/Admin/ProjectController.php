@@ -13,7 +13,7 @@ class ProjectController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth');
+        // $this->middleware('auth'); // Uncomment for authenticated access
     }
 
     public function index()
@@ -40,12 +40,11 @@ class ProjectController extends Controller
                 'abstract_url' => 'nullable|file|mimetypes:application/pdf|max:10240',
                 'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'category_id' => 'nullable|exists:categories,id',
-                'new_category' => 'nullable|string|max:255|unique:categories,name', // Remove required_if
+                'new_category' => 'nullable|string|max:255|unique:categories,name',
             ]);
 
             Log::info('Validated data: ', $validated);
 
-            // Handle new category creation only if new_category is provided and category_id is not
             if (empty($request->category_id) && !empty($request->new_category)) {
                 $category = Category::create([
                     'name' => $request->new_category,
@@ -56,7 +55,6 @@ class ProjectController extends Controller
                 throw new \Exception('Please select an existing category or provide a new category name.');
             }
 
-            // Handle file uploads
             if ($request->hasFile('abstract_url')) {
                 $validated['abstract_url'] = $request->file('abstract_url')->store('abstracts', 'public');
             }
@@ -64,7 +62,7 @@ class ProjectController extends Controller
                 $validated['thumbnail'] = $request->file('thumbnail')->store('thumbnails', 'public');
             }
 
-            $validated['uploaded_by'] = auth()->id();
+            $validated['uploaded_by'] = auth()->id() ?? null; // Allow null for public access
             $validated['status'] = 'Draft';
 
             $project = Project::create($validated);
@@ -100,7 +98,6 @@ class ProjectController extends Controller
 
             Log::info('Validated data: ', $validated);
 
-            // Handle new category creation only if new_category is provided and category_id is not
             if (empty($request->category_id) && !empty($request->new_category)) {
                 $category = Category::create([
                     'name' => $request->new_category,
@@ -111,7 +108,6 @@ class ProjectController extends Controller
                 throw new \Exception('Please select an existing category or provide a new category name.');
             }
 
-            // Handle file uploads
             if ($request->hasFile('abstract_url')) {
                 if ($project->abstract_url) {
                     Storage::disk('public')->delete($project->abstract_url);

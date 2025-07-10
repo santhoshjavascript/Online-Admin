@@ -2,14 +2,13 @@
 
 namespace App\Models;
 
-use App\Enums\Status;
-use App\Models\Category;
-use App\Models\User;
-use App\Models\Bookmark;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Project extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'title',
         'description',
@@ -22,12 +21,11 @@ class Project extends Model
     ];
 
     protected $casts = [
-        'status' => Status::class,
-        'category_id' => 'integer',
-        'uploaded_by' => 'integer',
+        'status' => 'string', // Since status is an enum in the database, treat it as a string
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
-    // Relationships
     public function category()
     {
         return $this->belongsTo(Category::class);
@@ -36,10 +34,5 @@ class Project extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'uploaded_by');
-    }
-
-    public function bookmarks()
-    {
-        return $this->hasMany(Bookmark::class);
     }
 }

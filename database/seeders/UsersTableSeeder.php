@@ -9,14 +9,11 @@ class UsersTableSeeder extends Seeder
 {
     public function run()
     {
-
-
         User::create([
             'name' => 'Zinna',
             'email' => 'zinna@gmail.com',
             'password' => bcrypt('zinna@123'),
-            'role' => 'admin',
+            'role' => 'Admin', // Updated to match ENUM (case-sensitive)
         ]);
-
     }
 }

@@ -11,11 +11,15 @@ class DatabaseSeeder extends Seeder
 {
     public function run()
     {
+        // Call UsersTableSeeder
+        $this->call(UsersTableSeeder::class);
+
+        // Existing DatabaseSeeder logic
         $user = User::create([
             "name" => "Test User",
             "email" => "test@example.com",
             "password" => bcrypt("password"),
-            "role" => "student",
+            "role" => "Student", // Updated to match ENUM (case-sensitive)
         ]);
 
         $category = Category::create(["name" => "Technology"]);
