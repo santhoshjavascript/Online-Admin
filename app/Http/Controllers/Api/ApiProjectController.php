@@ -24,8 +24,6 @@ class ApiProjectController extends Controller
             // Filter by category if provided
             if ($request->has('category')) {
                 $categoryQuery = $request->input('category');
-
-                // Check if category is a numeric ID or a name
                 if (is_numeric($categoryQuery)) {
                     $query->where('category_id', $categoryQuery);
                 } else {
@@ -35,7 +33,12 @@ class ApiProjectController extends Controller
                 }
             }
 
-            $projects = $query->get();
+            $projects = $query->get()->map(function ($project) {
+                // Append full URLs for thumbnail and abstract_url
+                $project->thumbnail = $project->thumbnail ? url('storage/' . $project->thumbnail) : null;
+                $project->abstract_url = $project->abstract_url ? url('storage/' . $project->abstract_url) : null;
+                return $project;
+            });
 
             return response()->json([
                 'status' => 'success',
@@ -56,6 +59,10 @@ class ApiProjectController extends Controller
     {
         try {
             $project = Project::with(['category', 'user'])->findOrFail($id);
+            // Append full URLs for thumbnail and abstract_url
+            $project->thumbnail = $project->thumbnail ? url('storage/' . $project->thumbnail) : null;
+            $project->abstract_url = $project->abstract_url ? url('storage/' . $project->abstract_url) : null;
+
             return response()->json([
                 'status' => 'success',
                 'data' => $project,
@@ -110,6 +117,9 @@ class ApiProjectController extends Controller
             $validated['status'] = 'Draft';
 
             $project = Project::create($validated);
+            // Append full URLs for the response
+            $project->thumbnail = $project->thumbnail ? url('storage/' . $project->thumbnail) : null;
+            $project->abstract_url = $project->abstract_url ? url('storage/' . $project->abstract_url) : null;
 
             return response()->json([
                 'status' => 'success',
@@ -138,7 +148,7 @@ class ApiProjectController extends Controller
                 'abstract_url' => 'nullable|file|mimetypes:application/pdf|max:10240',
                 'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'category_id' => 'nullable|exists:categories,id',
-                'new_category' => 'nullable|string|max:255|unique:categories,name,' . ($project->category_id ? $project->category->id : ''),
+                'new_category' => 'nullable|string|max:255|unique:categories,name,' . ($project->category_id ? $project->category_id : null),
             ]);
 
             Log::info('API Update method called', ['project_id' => $id, 'data' => $request->all()]);
@@ -175,6 +185,9 @@ class ApiProjectController extends Controller
             }
 
             $project->update($validated);
+            // Append full URLs for the response
+            $project->thumbnail = $project->thumbnail ? url('storage/' . $project->thumbnail) : null;
+            $project->abstract_url = $project->abstract_url ? url('storage/' . $project->abstract_url) : null;
 
             return response()->json([
                 'status' => 'success',

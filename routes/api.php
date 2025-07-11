@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\ApiProjectController;
 use App\Http\Controllers\Api\ApiCategoryController;
+use App\Http\Controllers\Api\AuthController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('projects')->group(function () {
@@ -19,3 +20,5 @@ Route::prefix('categories')->group(function () {
     Route::put('/{id}', [ApiCategoryController::class, 'update'])->name('api.categories.update');
     Route::delete('/{id}', [ApiCategoryController::class, 'destroy'])->name('api.categories.destroy');
 });
+
+Route::post('login', [AuthController::class, 'login'])->name('api.login');

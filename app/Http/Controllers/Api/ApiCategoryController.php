@@ -17,7 +17,17 @@ class ApiCategoryController extends Controller
     public function index()
     {
         try {
-            $categories = Category::with('projects')->get();
+            $categories = Category::with(['projects' => function ($query) {
+                $query->select('id', 'title', 'description', 'video_url', 'abstract_url', 'thumbnail', 'status', 'category_id', 'uploaded_by');
+            }])->get()->map(function ($category) {
+                // Append full URLs for projects' thumbnail and abstract_url
+                $category->projects->each(function ($project) {
+                    $project->thumbnail = $project->thumbnail ? url('storage/' . $project->thumbnail) : null;
+                    $project->abstract_url = $project->abstract_url ? url('storage/' . $project->abstract_url) : null;
+                });
+                return $category;
+            });
+
             return response()->json([
                 'status' => 'success',
                 'data' => $categories,
@@ -36,7 +46,16 @@ class ApiCategoryController extends Controller
     public function show($id)
     {
         try {
-            $category = Category::with('projects')->findOrFail($id);
+            $category = Category::with(['projects' => function ($query) {
+                $query->select('id', 'title', 'description', 'video_url', 'abstract_url', 'thumbnail', 'status', 'category_id', 'uploaded_by');
+            }])->findOrFail($id);
+
+            // Append full URLs for projects' thumbnail and abstract_url
+            $category->projects->each(function ($project) {
+                $project->thumbnail = $project->thumbnail ? url('storage/' . $project->thumbnail) : null;
+                $project->abstract_url = $project->abstract_url ? url('storage/' . $project->abstract_url) : null;
+            });
+
             return response()->json([
                 'status' => 'success',
                 'data' => $category,
@@ -113,7 +132,14 @@ class ApiCategoryController extends Controller
         try {
             $category = Category::findOrFail($id);
 
-            // Note: Projects linked to this category will have category_id set to NULL due to ON DELETE SET NULL
+            // Prevent deletion if category has associated projects
+            if ($category->projects()->count() > 0) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Cannot delete category with associated projects',
+                ], 400);
+            }
+
             $category->delete();
 
             return response()->json([

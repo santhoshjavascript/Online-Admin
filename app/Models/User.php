@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasFactory;
+    use HasFactory, HasApiTokens;
 
     protected $fillable = [
         'name',
@@ -28,11 +29,6 @@ class User extends Authenticatable
         return $this->hasMany(Project::class, 'uploaded_by');
     }
 
-    /**
-     * Check if the user is an admin.
-     *
-     * @return bool
-     */
     public function isAdmin()
     {
         return $this->is_admin || $this->role === \App\Enums\Role::ADMIN;
