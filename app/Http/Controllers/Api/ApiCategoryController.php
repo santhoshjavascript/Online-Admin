@@ -6,6 +6,7 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class ApiCategoryController extends Controller
 {
@@ -25,6 +26,8 @@ class ApiCategoryController extends Controller
                     $project->thumbnail = $project->thumbnail ? url('storage/' . $project->thumbnail) : null;
                     $project->abstract_url = $project->abstract_url ? url('storage/' . $project->abstract_url) : null;
                 });
+                // Append full URL for category image
+                $category->image = $category->image ? url('storage/' . $category->image) : null;
                 return $category;
             });
 
@@ -55,6 +58,8 @@ class ApiCategoryController extends Controller
                 $project->thumbnail = $project->thumbnail ? url('storage/' . $project->thumbnail) : null;
                 $project->abstract_url = $project->abstract_url ? url('storage/' . $project->abstract_url) : null;
             });
+            // Append full URL for category image
+            $category->image = $category->image ? url('storage/' . $category->image) : null;
 
             return response()->json([
                 'status' => 'success',
@@ -77,11 +82,20 @@ class ApiCategoryController extends Controller
             $validated = $request->validate([
                 'name' => 'required|string|max:255|unique:categories,name',
                 'description' => 'nullable|string',
+                'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // Max 2MB
             ]);
+
+            // Handle image upload
+            if ($request->hasFile('image')) {
+                $validated['image'] = $request->file('image')->store('categories', 'public');
+            }
 
             Log::info('API Category Store method called', $request->all());
 
             $category = Category::create($validated);
+
+            // Append full URL for category image
+            $category->image = $category->image ? url('storage/' . $category->image) : null;
 
             return response()->json([
                 'status' => 'success',
@@ -106,11 +120,24 @@ class ApiCategoryController extends Controller
             $validated = $request->validate([
                 'name' => 'required|string|max:255|unique:categories,name,' . $category->id,
                 'description' => 'nullable|string',
+                'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             ]);
+
+            // Handle image upload
+            if ($request->hasFile('image')) {
+                // Delete old image if it exists
+                if ($category->image) {
+                    Storage::disk('public')->delete($category->image);
+                }
+                $validated['image'] = $request->file('image')->store('categories', 'public');
+            }
 
             Log::info('API Category Update method called', ['category_id' => $id, 'data' => $request->all()]);
 
             $category->update($validated);
+
+            // Append full URL for category image
+            $category->image = $category->image ? url('storage/' . $category->image) : null;
 
             return response()->json([
                 'status' => 'success',
@@ -138,6 +165,11 @@ class ApiCategoryController extends Controller
                     'status' => 'error',
                     'message' => 'Cannot delete category with associated projects',
                 ], 400);
+            }
+
+            // Delete image if it exists
+            if ($category->image) {
+                Storage::disk('public')->delete($category->image);
             }
 
             $category->delete();

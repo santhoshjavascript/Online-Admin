@@ -3,7 +3,6 @@
 @section('content')
     <!-- Header Section -->
     <div class="head-title flex justify-between items-center mb-8 bg-white p-6 rounded-xl shadow-lg">
-
         <a href="{{ route('admin.projects.create') }}" class="btn-download inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-md hover:shadow-lg">
             <i class='bx bxs-plus-circle mr-2'></i>
             <span class="text">Add New Project</span>
@@ -15,13 +14,13 @@
         <div class="order bg-white p-6 rounded-xl shadow-lg overflow-hidden">
             <div class="head flex justify-between items-center mb-6">
                 <h3 class="text-2xl font-semibold text-gray-900">Projects List</h3>
-
             </div>
             <div class="table-responsive">
                 <table class="w-full table-auto border-collapse">
                     <thead>
                         <tr class="bg-gray-100">
-                            <th class="p-4 text-left text-sm font-medium text-gray-700 border-b border-gray-200">ID</th>
+                            <th class="p-4 text-left text-sm font-medium text-gray-700 border-b border-gray-200">Number</th>
+                            <th class="p-4 text-left text-sm font-medium text-gray-700 border-b border-gray-200">Thumbnail</th>
                             <th class="p-4 text-left text-sm font-medium text-gray-700 border-b border-gray-200">Title</th>
                             <th class="p-4 text-left text-sm font-medium text-gray-700 border-b border-gray-200">Category</th>
                             <th class="p-4 text-left text-sm font-medium text-gray-700 border-b border-gray-200">Status</th>
@@ -29,14 +28,23 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @php
+                            $counter = 1;
+                        @endphp
                         @forelse ($projects as $project)
                             <tr class="hover:bg-gray-50 transition-colors duration-200">
-                                <td class="p-4 text-gray-800 border-b border-gray-200">{{ $project->id }}</td>
+                                <td class="p-4 text-gray-800 border-b border-gray-200">{{ $counter++ }}</td>
+                                <td class="p-4 text-gray-800 border-b border-gray-200">
+                                    @if ($project->thumbnail)
+                                        <img src="{{ Storage::url($project->thumbnail) }}" alt="{{ $project->title }}" class="index-thumbnail w-16 h-16 object-cover rounded-lg shadow-sm">
+                                    @else
+                                        <span class="text-gray-500">No Thumbnail</span>
+                                    @endif
+                                </td>
                                 <td class="p-4 text-gray-800 border-b border-gray-200">{{ $project->title }}</td>
                                 <td class="p-4 text-gray-600 border-b border-gray-200">{{ $project->category->name ?? 'N/A' }}</td>
                                 <td class="p-4 border-b border-gray-200">
                                     <span class="status inline-block px-3 py-1 text-sm font-semibold rounded-full">
-                                          {{-- style="{{ (strtolower($project->status) === 'published') ? 'background-color: #dbeafe; color: #1e40af' : (strtolower($project->status) === 'draft') ? 'background-color: #fefcbf; color: #92400e' : 'background-color: #e5e7eb; color: #4b5563' }}"> --}}
                                         {{ $project->status }}
                                     </span>
                                 </td>
@@ -55,7 +63,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="p-4 text-center text-gray-500 border-b border-gray-200">No projects found.</td>
+                                <td colspan="6" class="p-4 text-center text-gray-500 border-b border-gray-200">No projects found.</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -65,16 +73,17 @@
     </div>
 
     <style>
+
+        .index-thumbnail {
+            width: 50px;
+            height: 50px;
+        }
         .head-title {
             background: var(--light);
             border-radius: 20px;
             padding: 24px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             margin-bottom: 2rem;
-        }
-
-        .breadcrumb li a {
-            transition: color 0.3s ease;
         }
 
         .btn-download {

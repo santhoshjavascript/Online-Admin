@@ -36,6 +36,16 @@
                 @enderror
             </div>
 
+            <!-- Image Field -->
+            <div class="form-group">
+                <label for="image" class="block text-lg font-semibold text-gray-800 mb-2">Category Image</label>
+                <input type="file" name="image" id="image"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm hover:shadow-md @error('image') border-red-500 @enderror" />
+                @error('image')
+                    <p class="mt-2 text-sm text-red-600 flex items-center"><i class='bx bx-error mr-1'></i>{{ $message }}</p>
+                @enderror
+            </div>
+
             <!-- Submit Button -->
             <button type="submit" class="btn-submit inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-md hover:shadow-lg">
                 <i class='bx bx-save mr-2'></i>
@@ -64,7 +74,7 @@
         }
 
         .form-group {
-            margin-bottom: 1.75rem;
+            margin-bottom: 1.5rem;
         }
 
         .form-group label {
@@ -75,9 +85,9 @@
             letter-spacing: 0.5px;
         }
 
-        input[type="text"] {
+        input[type="text"], input[type="file"] {
             width: 100%;
-            padding: 0.875rem 1rem;
+            padding: 0.75rem 1rem;
             border: 2px solid #e5e7eb;
             border-radius: 10px;
             transition: border-color 0.3s ease, box-shadow 0.3s ease;
@@ -85,9 +95,9 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
 
-        input[type="text"]:focus {
+        input[type="text"]:focus, input[type="file"]:focus {
             border-color: #3b82f6;
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15), 0 4px 12px rgba(59, 130, 246, 0.1);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15), 0 3px 9px rgba(59, 130, 246, 0.1);
             outline: none;
         }
 
@@ -95,16 +105,16 @@
             background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%);
             color: #ffffff;
             border-radius: 10px;
-            padding: 0.875rem 1.5rem;
+            padding: 0.75rem 1.25rem;
             transition: all 0.3s ease, transform 0.2s ease;
             font-weight: 600;
-            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
+            box-shadow: 0 3px 9px rgba(34, 197, 94, 0.2);
         }
 
         .btn-submit:hover {
             background: linear-gradient(90deg, #16a34a 0%, #15803d 100%);
-            box-shadow: 0 6px 16px rgba(34, 197, 94, 0.3);
-            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+            transform: translateY(-1px);
         }
 
         @media (max-width: 768px) {
@@ -121,7 +131,7 @@
                 font-size: 0.875rem;
             }
 
-            input[type="text"] {
+            input[type="text"], input[type="file"] {
                 padding: 0.625rem 0.875rem;
             }
 
@@ -138,13 +148,12 @@
             display: flex;
             align-items: center;
         }
-        
 
         .alert {
             border-radius: 10px;
-            padding: 1.25rem;
-            margin-bottom: 1.5rem;
-            border-left: 4px solid #22c55e;
+            padding: 1rem;
+            margin-bottom: 1.25rem;
+            border-left: 3px solid #22c55e;
             background: #f0fdf4;
         }
     </style>

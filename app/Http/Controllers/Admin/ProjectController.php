@@ -67,7 +67,7 @@ class ProjectController extends Controller
 
             $project = Project::create($validated);
 
-            return redirect()->route('admin.projects.edit', $project)
+            return redirect()->route('admin.projects.index')
                              ->with('success', 'Project created successfully.');
         } catch (\Exception $e) {
             Log::error('Project creation failed: ' . $e->getMessage());
@@ -128,7 +128,7 @@ class ProjectController extends Controller
 
             $project->update($validated);
 
-            return redirect()->route('admin.projects.edit', $project)
+            return redirect()->route('admin.projects.index')
                              ->with('success', 'Project updated successfully.');
         } catch (\Exception $e) {
             Log::error('Project update failed: ' . $e->getMessage());

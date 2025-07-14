@@ -9,13 +9,13 @@ class Category extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'name',
-        'description',
-    ];
+    protected $fillable = ['name', 'description', 'image'];
 
+    /**
+     * Get the projects associated with this category.
+     */
     public function projects()
     {
-        return $this->hasMany(Project::class);
+        return $this->hasMany(Project::class, 'category_id');
     }
 }
